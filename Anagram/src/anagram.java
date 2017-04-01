@@ -4,10 +4,10 @@
  * as this header stays intact.
  */
 
-public class anagram extends WordList implements UsefulConstants {
-	static Word[] Candidate = new Word[MAXWORDS];
+public class Anagram extends WordList implements UsefulConstants {
+	static Word[] candidate = new Word[MAXWORDS];
 	static int totCandidates=0,
-			   MinimumLength = 3;
+			   minimumLength = 3;
 	
 	public static void main(String[] argv) {
 		if (argv.length < 1 || argv.length > 3) {
@@ -16,36 +16,36 @@ public class anagram extends WordList implements UsefulConstants {
 		}
 		
 		if (argv.length >= 2)
-			MinimumLength = Integer.parseInt(argv[1]);
+			minimumLength = Integer.parseInt(argv[1]);
 		
 		// word filename is optional 3rd argument
-		ReadDict( argv.length==3? argv[2] : "words.txt" );
-		DoAnagrams(argv[0]);
+		readDict( argv.length==3? argv[2] : "words.txt" );
+		doAnagrams(argv[0]);
 	}
 	
-	static void DoAnagrams(String anag)
+	static void doAnagrams(String anag)
 	{
 		Word myAnagram = new Word(anag);
 
 		
 		getCandidates(myAnagram);
-		PrintCandidate();
+		printCandidate();
 		
-		int RootIndexEnd = sortCandidates(myAnagram);
+		int rootIndexEnd = sortCandidates(myAnagram);
 		
 		o.println("Anagrams of " + anag + ":");
-		FindAnagram(myAnagram, new String[50],  0, 0, RootIndexEnd);
+		findAnagram(myAnagram, new String[50],  0, 0, rootIndexEnd);
 		
 		o.println("----" + anag + "----");
 	}
 
 	static void getCandidates(Word d) {
 		for (int i = totCandidates = 0; i < totWords; i++)
-			if (   (    Dictionary[i].total >= MinimumLength   )
-				&& (    Dictionary[i].total + MinimumLength <= d.total
-					||  Dictionary[i].total == d.total)
-				&& ( fewerOfEachLetter(d.count, Dictionary[i].count) )  )
-				Candidate[totCandidates++]=Dictionary[i];
+			if (   (    dictionary[i].total >= minimumLength   )
+				&& (    dictionary[i].total + minimumLength <= d.total
+					||  dictionary[i].total == d.total)
+				&& ( fewerOfEachLetter(d.count, dictionary[i].count) )  )
+				candidate[totCandidates++]=dictionary[i];
 		
 	}
 	
@@ -56,48 +56,49 @@ public class anagram extends WordList implements UsefulConstants {
 		return true;
 	}
 	
-	static void PrintCandidate()
+	static void printCandidate()
 	{
-		o.println("Candiate words:");
-		for (int i=0; i < totCandidates; i++)
-			o.print( Candidate[i].aword + ", " + ((i%4 ==3) ?"\n":" " ) );
+		o.println("Candidate words:");
+		for (int i=0; i < totCandidates; i++) {
+			o.print( candidate[i].aword + ", " + ((i%4 ==3) ?"\n":" " ) );
+		}
 		o.println("");
 		o.println();
 	}
 
-	static void FindAnagram(
+	static void findAnagram(
 		Word d,
-		String WordArray[],
-		int Level, int StartAt, int EndAt) 
+		String wordArray[],
+		int level, int startAt, int endAt) 
 	{
 		int i, j;
 		boolean enoughCommonLetters;
-		Word WordToPass = new Word("");
+		Word wordToPass = new Word("");
 		
-		for (i = StartAt; i < EndAt; i++) {
+		for (i = startAt; i < endAt; i++) {
 			enoughCommonLetters = true;
 			for (j = 25; j >= 0 && enoughCommonLetters; j--)
-				if (d.count[j] < Candidate[i].count[j])
+				if (d.count[j] < candidate[i].count[j])
 					enoughCommonLetters = false;
 			
 			if (enoughCommonLetters) {
-				WordArray[Level] = Candidate[i].aword;
-				WordToPass.total = 0;
+				wordArray[level] = candidate[i].aword;
+				wordToPass.total = 0;
 				for (j = 25; j >= 0; j--) {
-					WordToPass.count[j] = (byte) (d.count[j] - Candidate[i].count[j] );
-					if ( WordToPass.count[j] != 0 ) {
-						WordToPass.total += WordToPass.count[j];
+					wordToPass.count[j] = (byte) (d.count[j] - candidate[i].count[j] );
+					if ( wordToPass.count[j] != 0 ) {
+						wordToPass.total += wordToPass.count[j];
 					}
 				}
-				if (WordToPass.total == 0) {
+				if (wordToPass.total == 0) {
 					/* Found a series of words! */
-					for (j = 0; j <= Level; j++)
-						o.print(WordArray[j] + " ");
+					for (j = 0; j <= level; j++)
+						o.print(wordArray[j] + " ");
 					o.println();
-				} else if (WordToPass.total < MinimumLength) {
+				} else if (wordToPass.total < minimumLength) {
 					; /* Don't call again */
 				} else {
-					FindAnagram(WordToPass, WordArray, Level+1,i, totCandidates);
+					findAnagram(wordToPass, wordArray, level+1,i, totCandidates);
 				}
 			}
 		}
@@ -105,28 +106,28 @@ public class anagram extends WordList implements UsefulConstants {
 
 	static int sortCandidates(Word d)
 	{
-		int[] MasterCount=new int[26];
-		int LeastCommonIndex=0, LeastCommonCount;
+		int[] masterCount=new int[26];
+		int leastCommonIndex=0, leastCommonCount;
 		int i, j;
 		
-		for (j = 25; j >= 0; j--) MasterCount[j] = 0;
+		for (j = 25; j >= 0; j--) masterCount[j] = 0;
 		for (i = totCandidates-1; i >=0; i--)
 			for (j = 25; j >=0; j--)
-				MasterCount[j] += Candidate[i].count[j];
+				masterCount[j] += candidate[i].count[j];
 		
-		LeastCommonCount = MAXWORDS * 5;
+		leastCommonCount = MAXWORDS * 5;
 		for (j = 25; j >= 0; j--)
-			if (    MasterCount[j] != 0
-				 && MasterCount[j] < LeastCommonCount
+			if (    masterCount[j] != 0
+				 && masterCount[j] < leastCommonCount
 				 && d.containsLetter(j)  ) {
-				LeastCommonCount = MasterCount[j];
-				LeastCommonIndex = j;
+				leastCommonCount = masterCount[j];
+				leastCommonIndex = j;
 			}
 		
-		quickSort(0, totCandidates-1, LeastCommonIndex );
+		quickSort(0, totCandidates-1, leastCommonIndex );
 		
 		for (i = 0; i < totCandidates; i++)
-			if (Candidate[i].containsLetter(LeastCommonIndex))
+			if (candidate[i].containsLetter(leastCommonIndex))
 				break;
 		
 		return i;
@@ -140,7 +141,7 @@ public class anagram extends WordList implements UsefulConstants {
 		swap(left, (left+right)/2);
 		last = left;
 		for (i=left+1; i <=right; i++)  /* partition */
-			if (Candidate[i].MultiFieldCompare ( Candidate[left], LeastCommonIndex ) ==  -1 )
+			if (candidate[i].multiFieldCompare ( candidate[left], LeastCommonIndex ) ==  -1 )
 				swap( ++last, i);
 		
 		swap(last, left);
@@ -149,8 +150,8 @@ public class anagram extends WordList implements UsefulConstants {
 	}
 	
 	static void swap(int d1, int d2) {
-		Word tmp = Candidate[d1];
-		Candidate[d1] = Candidate[d2];
-		Candidate[d2] = tmp;
+		Word tmp = candidate[d1];
+		candidate[d1] = candidate[d2];
+		candidate[d2] = tmp;
 	}
 }
