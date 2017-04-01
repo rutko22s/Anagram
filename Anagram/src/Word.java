@@ -9,7 +9,9 @@ public class Word  {
 		aword = s;
 		total = 0;
 		s = s.toLowerCase();
-		for (int i = 'a'; i <= 'z'; i++) count[i-'a'] = 0;
+		for (int i = 'a'; i <= 'z'; i++) {
+			count[i-'a'] = 0;
+		}
 
 		for (int i = s.length()-1; i >= 0; i--) {
 			ch = s.charAt(i) - 'a';
@@ -24,7 +26,7 @@ public class Word  {
 		return count[j] != 0;
 	}
 
-	public int MultiFieldCompare(Word t, int LeastCommonIndex)
+	public int multiFieldCompare(Word t, int LeastCommonIndex)
 	{
 		if ( (containsLetter(LeastCommonIndex) ) &&  !(t.containsLetter(LeastCommonIndex)) )
 			return 1;

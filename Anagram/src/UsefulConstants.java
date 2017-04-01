@@ -14,7 +14,7 @@ public interface UsefulConstants {
 	public static final int MAXWORDLEN = 30;
 	public static final int EOF = -1;
 	
-	// shorter alias for I/O streams
+	// shorter alias for I/O streams - probably not necessary
 	public static final PrintStream o = System.out;
 	public static final PrintStream e = System.err;
 }
