@@ -1,6 +1,7 @@
+import static constants.UsefulConstants.*;
 import java.io.*;
 
-public class WordList implements UsefulConstants {
+public class WordList {
 	static Word[] dictionary = new Word[MAXWORDS];
 	static int totWords=0;
 

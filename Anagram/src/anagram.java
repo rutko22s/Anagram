@@ -1,10 +1,8 @@
-/*
- * Usage: java Anagram string [[min-len] wordfile] Java Anagram program, Peter
- * van der Linden Jan 7, 1996. Feel free to pass this program around, as long
- * as this header stays intact.
- */
+import static constants.UsefulConstants.*;
 
-public class Anagram extends WordList implements UsefulConstants {
+import constants.UsefulConstants;
+
+public class Anagram extends WordList {
 	static Word[] candidate = new Word[MAXWORDS];
 	static int totCandidates=0,
 			   minimumLength = 3;
@@ -41,9 +39,9 @@ public class Anagram extends WordList implements UsefulConstants {
 
 	static void getCandidates(Word d) {
 		for (int i = totCandidates = 0; i < totWords; i++)
-			if (   (    dictionary[i].total >= minimumLength   )
-				&& (    dictionary[i].total + minimumLength <= d.total
-					||  dictionary[i].total == d.total)
+			if (   (    dictionary[i].numLetters >= minimumLength   )
+				&& (    dictionary[i].numLetters + minimumLength <= d.numLetters
+					||  dictionary[i].numLetters == d.numLetters)
 				&& ( fewerOfEachLetter(d.count, dictionary[i].count) )  )
 				candidate[totCandidates++]=dictionary[i];
 		
@@ -60,7 +58,7 @@ public class Anagram extends WordList implements UsefulConstants {
 	{
 		o.println("Candidate words:");
 		for (int i=0; i < totCandidates; i++) {
-			o.print( candidate[i].aword + ", " + ((i%4 ==3) ?"\n":" " ) );
+			o.print( candidate[i].word + ", " + ((i%4 ==3) ?"\n":" " ) );
 		}
 		o.println("");
 		o.println();
@@ -82,20 +80,20 @@ public class Anagram extends WordList implements UsefulConstants {
 					enoughCommonLetters = false;
 			
 			if (enoughCommonLetters) {
-				wordArray[level] = candidate[i].aword;
-				wordToPass.total = 0;
+				wordArray[level] = candidate[i].word;
+				wordToPass.numLetters = 0;
 				for (j = 25; j >= 0; j--) {
 					wordToPass.count[j] = (byte) (d.count[j] - candidate[i].count[j] );
 					if ( wordToPass.count[j] != 0 ) {
-						wordToPass.total += wordToPass.count[j];
+						wordToPass.numLetters += wordToPass.count[j];
 					}
 				}
-				if (wordToPass.total == 0) {
+				if (wordToPass.numLetters == 0) {
 					/* Found a series of words! */
 					for (j = 0; j <= level; j++)
 						o.print(wordArray[j] + " ");
 					o.println();
-				} else if (wordToPass.total < minimumLength) {
+				} else if (wordToPass.numLetters < minimumLength) {
 					; /* Don't call again */
 				} else {
 					findAnagram(wordToPass, wordArray, level+1,i, totCandidates);
@@ -133,20 +131,24 @@ public class Anagram extends WordList implements UsefulConstants {
 		return i;
 	}
 
-	static void quickSort(int left, int right, int LeastCommonIndex)
+	static void quickSort(int left, int right, int leastCommonIndex)
 	{
 		// standard quicksort from any algorithm book
-		int i, last;
 		if (left >= right) return;
 		swap(left, (left+right)/2);
-		last = left;
-		for (i=left+1; i <=right; i++)  /* partition */
-			if (candidate[i].multiFieldCompare ( candidate[left], LeastCommonIndex ) ==  -1 )
+		int last = left;
+		for (int i=left+1; i <=right; i++)  /* partition */ {
+			//if the word at index i does not have a letter that the leftmost word does
+			if (candidate[i].multiFieldCompare ( candidate[left], leastCommonIndex ) ==  -1 ) {
+				//increment "last" by one and swap it with the word at our current index
 				swap( ++last, i);
-		
+			}
+		}
+		//swap "last" with our leftmost word
 		swap(last, left);
-		quickSort(left, last-1, LeastCommonIndex);
-		quickSort(last+1,right, LeastCommonIndex);
+		//recursively call the sort on the left half of the list, and the right
+		quickSort(left, last-1, leastCommonIndex);
+		quickSort(last+1,right, leastCommonIndex);
 	}
 	
 	static void swap(int d1, int d2) {

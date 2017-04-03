@@ -1,3 +1,4 @@
+package constants;
 /**
  * 
  */
@@ -9,7 +10,12 @@ import java.io.*;
  * @version Jan 7, 1996
  *
  */
-public interface UsefulConstants {
+public final class UsefulConstants {
+	
+	private UsefulConstants() {
+		//empty
+	}
+	
 	public static final int MAXWORDS = 100000;
 	public static final int MAXWORDLEN = 30;
 	public static final int EOF = -1;
